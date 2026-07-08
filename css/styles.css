@@ -21,3 +21,15 @@ body {
   border-radius: 8px;
   margin-bottom: 1rem;
 }
+
+.bueno {
+  color: var(--bueno);
+}
+
+.moderado {
+  color: var(--moderado);
+}
+
+.malo {
+  color: var(--malo);
+}

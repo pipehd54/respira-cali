@@ -14,7 +14,7 @@ const renderEstaciones = (estaciones) => {
     card.innerHTML = `
       <h2>${barrio}</h2>
       <p>AQI: <strong>${aqi}</strong></p>
-      <span>${nivel}</span>
+      <span class = "${nivel.toLowerCase()}">${nivel}</span>
     `;
     contenedor.append(card);
   });

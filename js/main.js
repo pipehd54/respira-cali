@@ -4,7 +4,7 @@ import { guardarEstado, cargarEstado } from './utils/storage.js';
 import { renderEstaciones } from './ui/render.js';
 import { debounce } from './utils/debounce.js';
 
-const estado = cargarEstado(); // recupera última sesión
+const estado = cargarEstado();
 let datosCali = [];
 
 async function obtenerDatos() {
@@ -12,8 +12,7 @@ async function obtenerDatos() {
   contenedor.innerHTML = '<p aria-live="polite">Cargando...</p>';
   try {
     const [aire, clima] = await Promise.all([getAire(), getClima()]);
-    const base = { ...aire, ...clima };
-    datosCali = ['La Flora','San Fernando','Aguablanca'].map(barrio => ({ id: barrio, barrio, ...base }));
+    datosCali = [{ id: 'cali', barrio: 'Cali (general)', ...aire, ...clima }];
   } catch (e) {
     contenedor.innerHTML = '<p role="alert">Error de red</p>';
     datosCali = [];
@@ -21,15 +20,14 @@ async function obtenerDatos() {
 }
 
 function aplicarFiltros() {
-  return datosCali.filter(({ barrio }) => 
-    barrio.toLowerCase().includes(estado.busqueda.toLowerCase())
-  );
+  const q = (estado.busqueda || '').toLowerCase();
+  return datosCali.filter(({ barrio }) => barrio.toLowerCase().includes(q));
 }
 
 async function actualizar() {
   if (!datosCali.length) await obtenerDatos();
   renderEstaciones(aplicarFiltros(), estado, document.querySelector('#estaciones'));
-  guardarEstado(estado); // persiste en cada cambio
+  guardarEstado(estado);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

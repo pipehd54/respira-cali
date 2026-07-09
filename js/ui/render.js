@@ -2,7 +2,7 @@ import { nivelAQI, aFahrenheit } from '../utils/logic.js';
 
 export function renderEstaciones(estaciones, estado, contenedor) {
   contenedor.innerHTML = '';
-  estaciones.forEach(({ barrio, aqi, pm25, tempC }) => {
+  estaciones.forEach(({ barrio, aqi = '—', pm25 = '—', tempC = '—' }) => {
     const temp = estado.unidad === 'C' ? `${tempC}°C` : `${aFahrenheit(tempC)}°F`;
     const esFav = estado.favoritos.includes(barrio);
     const card = document.createElement('article');

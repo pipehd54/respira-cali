@@ -214,3 +214,32 @@ footer {
   text-align: center;
   padding: 2rem 0;
 }
+
+.resultados-busqueda {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 0.25rem;
+  padding: 0.25rem 0;
+  box-shadow: var(--shadow);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.resultado-item {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: background 0.15s, color var(--transition);
+}
+
+.resultado-item:hover {
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg-card));
+}
+
+.resultados-busqueda p {
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}

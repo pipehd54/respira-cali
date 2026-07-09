@@ -1,6 +1,6 @@
 # Respira Cali
 
-Calidad del aire en tiempo real para Santiago de Cali. PWA ligera construida con Vanilla JS.
+Calidad del aire actual para Santiago de Cali. App web ligera construida con Vanilla JS.
 
 **Demo:** https://respira-cali.vercel.app/
 
@@ -8,11 +8,7 @@ Calidad del aire en tiempo real para Santiago de Cali. PWA ligera construida con
 - Vanilla JS ES2024+ (módulos)
 - Open-Meteo Air Quality + Weather API
 - localStorage, debounce, a11y
-
-## Lighthouse
-- Performance: 98
-- Accessibility: 100
-- Best Practices: 100
+- Tema claro/oscuro
 
 ## Desarrollo
 ```bash

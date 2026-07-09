@@ -5,22 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Monitorea el AQI, PM2.5 y temperatura de Cali sin apps pesadas. Datos en vivo de Open-Meteo, búsqueda instantánea con debounce, modo °C/°F y favoritos que recuerdan tu barrio.">
   <title>Respira Cali</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="js/main.js" defer></script>
 </head>
 <body>
   <header>
-    <div class="header-row">
-      <div>
-        <h1>Respira Cali</h1>
-        <p>Monitorea el AQI, PM2.5 y temperatura de Cali sin apps pesadas. Datos en vivo de Open-Meteo, búsqueda instantánea con debounce, modo °C/°F y favoritos que recuerdan tu barrio. Construida 100% en JavaScript moderno, sin frameworks, optimizada para móvil y accesible por teclado y lector de pantalla.</p>
-      </div>
+    <div class="header-top">
+      <h1>Respira Cali</h1>
       <button type="button" id="toggle-tema" class="btn-header" aria-label="Cambiar a modo claro">🌙</button>
     </div>
+    <p>Monitorea el AQI, PM2.5 y temperatura de Cali sin apps pesadas. Datos en vivo de Open-Meteo, búsqueda instantánea con debounce, modo °C/°F y favoritos que recuerdan tu barrio. Construida 100% en JavaScript moderno, sin frameworks, optimizada para móvil y accesible por teclado y lector de pantalla.</p>
 
     <form id="filtros" role="search">
-      <label for="busqueda">Buscar barrio</label>
-      <input id="busqueda" type="search" placeholder="Ej: San Fernando" autocomplete="off">
+      <input id="busqueda" type="search" placeholder="Buscar barrio... (Ej: San Fernando)" autocomplete="off" aria-label="Buscar barrio">
       <button type="button" id="toggle-temp" class="btn-header" aria-pressed="false">Mostrar °F</button>
     </form>
   </header>
@@ -33,34 +33,46 @@
     <section id="ayuda" aria-labelledby="ayuda-titulo">
       <h2 id="ayuda-titulo">¿Qué significan estos datos?</h2>
 
-      <h3>AQI — Índice de Calidad del Aire</h3>
-      <p>
-        El AQI traduce los niveles de contaminación en un número fácil de entender usando el estándar US AQI (el mismo usado en Colombia).
-      </p>
-      <ul class="aqi-escala">
-        <li class="escala-bueno"><span class="dot"></span> <strong>0-50 Bueno</strong> — Verde. El aire es seguro. Sal a correr sin problema.</li>
-        <li class="escala-moderado"><span class="dot"></span> <strong>51-100 Moderado</strong> — Amarillo. Aceptable, pero personas sensibles podrían sentir molestias.</li>
-        <li class="escala-danino"><span class="dot"></span> <strong>101-150 Dañino para grupos sensibles</strong> — Naranja. Niños, adultos mayores y personas con asma deben limitar el esfuerzo al aire libre.</li>
-        <li class="escala-peligroso"><span class="dot"></span> <strong>151-200 No saludable</strong> — Rojo. Todos pueden empezar a sentir efectos. Reduce actividades intensas afuera.</li>
-        <li class="escala-muy-peligroso"><span class="dot"></span> <strong>201-300 Muy no saludable</strong> — Alerta de salud. Evita salir si puedes.</li>
-        <li class="escala-extremo"><span class="dot"></span> <strong>301+ Peligroso</strong> — Emergencia. Permanece en interiores.</li>
-      </ul>
+      <details open>
+        <summary>AQI — Índice de Calidad del Aire</summary>
+        <div class="accordion-body">
+          <p>
+            El AQI traduce los niveles de contaminación en un número fácil de entender usando el estándar US AQI (el mismo usado en Colombia).
+          </p>
+          <ul class="aqi-escala">
+            <li class="escala-bueno"><span class="dot"></span> <strong>0-50 Bueno</strong> — Verde. El aire es seguro. Sal a correr sin problema.</li>
+            <li class="escala-moderado"><span class="dot"></span> <strong>51-100 Moderado</strong> — Amarillo. Aceptable, pero personas sensibles podrían sentir molestias.</li>
+            <li class="escala-danino"><span class="dot"></span> <strong>101-150 Dañino para grupos sensibles</strong> — Naranja. Niños, adultos mayores y personas con asma deben limitar el esfuerzo al aire libre.</li>
+            <li class="escala-peligroso"><span class="dot"></span> <strong>151-200 No saludable</strong> — Rojo. Todos pueden empezar a sentir efectos. Reduce actividades intensas afuera.</li>
+            <li class="escala-muy-peligroso"><span class="dot"></span> <strong>201-300 Muy no saludable</strong> — Alerta de salud. Evita salir si puedes.</li>
+            <li class="escala-extremo"><span class="dot"></span> <strong>301+ Peligroso</strong> — Emergencia. Permanece en interiores.</li>
+          </ul>
+        </div>
+      </details>
 
-      <h3>PM2.5 — Partículas finas</h3>
-      <p>
-        PM2.5 son partículas de 2.5 micrones o menos (un cabello humano mide ~70 µm). Son tan pequeñas que entran a los pulmones y al torrente sanguíneo.
-      </p>
-      <p>
-        El AQI ya incluye PM2.5 en su cálculo, pero mostramos el valor bruto para que conozcas la concentración real. Según la OMS, el límite diario recomendado es 15 µg/m³.
-      </p>
+      <details>
+        <summary>PM2.5 — Partículas finas</summary>
+        <div class="accordion-body">
+          <p>
+            PM2.5 son partículas de 2.5 micrones o menos (un cabello humano mide ~70 µm). Son tan pequeñas que entran a los pulmones y al torrente sanguíneo.
+          </p>
+          <p>
+            El AQI ya incluye PM2.5 en su cálculo, pero mostramos el valor bruto para que conozcas la concentración real. Según la OMS, el límite diario recomendado es 15 µg/m³.
+          </p>
+        </div>
+      </details>
 
-      <h3>¿Qué hacer si el aire está malo?</h3>
-      <ul>
-        <li>Cierra ventanas y usa purificador si tienes.</li>
-        <li>Evita ejercicio intenso al aire libre.</li>
-        <li>Usa tapabocas N95 si debes salir y el AQI supera 150.</li>
-        <li>Hidrátate: ayuda a tu cuerpo a eliminar partículas.</li>
-      </ul>
+      <details>
+        <summary>¿Qué hacer si el aire está malo?</summary>
+        <div class="accordion-body">
+          <ul>
+            <li>Cierra ventanas y usa purificador si tienes.</li>
+            <li>Evita ejercicio intenso al aire libre.</li>
+            <li>Usa tapabocas N95 si debes salir y el AQI supera 150.</li>
+            <li>Hidrátate: ayuda a tu cuerpo a eliminar partículas.</li>
+          </ul>
+        </div>
+      </details>
     </section>
   </main>
   

@@ -1,23 +1,29 @@
+/* ── Variables (modo oscuro por defecto) ── */
+
 :root {
-  --bg: #0f172a;
-  --bg-card: #1e293b;
+  --bg: #090e1a;
+  --bg-card: #111827;
+  --bg-card-elevated: #1a2332;
   --text: #f1f5f9;
   --text-secondary: #94a3b8;
-  --border: #334155;
+  --border: #1e293b;
   --bueno: #22c55e;
   --moderado: #eab308;
   --danino: #f97316;
   --malo: #ef4444;
+  --muy-malo: #a855f7;
+  --peligroso: #be123c;
   --accent: #38bdf8;
   --accent-hover: #7dd3fc;
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-  --radius: 12px;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+  --radius: 16px;
   --transition: 0.25s ease;
 }
 
 [data-tema="claro"] {
   --bg: #f1f5f9;
   --bg-card: #ffffff;
+  --bg-card-elevated: #f8fafc;
   --text: #0f172a;
   --text-secondary: #64748b;
   --border: #e2e8f0;
@@ -31,7 +37,7 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   margin: 0;
@@ -51,30 +57,34 @@ header, main, footer {
 header {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
 }
 
-.header-row {
+.header-top {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
 }
 
 header h1 {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
 }
 
 header p {
-  margin: 0.3rem 0 0;
-  font-size: 0.85rem;
-  line-height: 1.5;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: var(--text-secondary);
   transition: color var(--transition);
-  max-width: 480px;
+  max-width: 520px;
 }
 
 /* ── Formulario ── */
@@ -82,34 +92,34 @@ header p {
 #filtros {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: flex-start;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
 #filtros label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: color var(--transition);
-  align-self: center;
+  display: none;
 }
 
-/* ── Search wrapper (contenedor relativo para dropdown absoluto) ── */
+/* ── Search wrapper ── */
 
 .search-wrapper {
   position: relative;
-  flex: 1 1 180px;
+  flex: 1 1 250px;
+  max-width: 400px;
   min-width: 0;
 }
 
 .search-wrapper #busqueda {
   width: 100%;
-  padding: 0.55rem 0.75rem;
+  padding: 0.65rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--bg-card);
   color: var(--text);
   font-size: 0.9rem;
+  font-family: inherit;
   transition: background var(--transition), color var(--transition),
               border-color var(--transition), box-shadow var(--transition);
 }
@@ -117,7 +127,7 @@ header p {
 .search-wrapper #busqueda:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
 }
 
 /* ── Dropdown de resultados ── */
@@ -132,7 +142,7 @@ header p {
   overflow-y: auto;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.25rem 0;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   transition: background var(--transition), border-color var(--transition);
@@ -164,11 +174,11 @@ header p {
 }
 
 .resultado-item:hover {
-  background: color-mix(in srgb, var(--accent) 18%, var(--bg-card));
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
 }
 
 .resultado-item:active {
-  background: color-mix(in srgb, var(--accent) 30%, var(--bg-card));
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg-card));
 }
 
 .resultados-busqueda p {
@@ -183,11 +193,12 @@ header p {
 .btn-header {
   padding: 0.5rem 0.85rem;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--bg-card);
   color: var(--text);
   font-size: 0.85rem;
   font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
   transition: background var(--transition), color var(--transition),
               border-color var(--transition), transform 0.15s;
@@ -203,6 +214,8 @@ header p {
 }
 
 #toggle-tema {
+  position: absolute;
+  right: 0;
   font-size: 1.3rem;
   line-height: 1;
   padding: 0.4rem 0.65rem;
@@ -223,8 +236,8 @@ header p {
 
 .estacion-card:hover {
   transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.25);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 [data-tema="claro"] .estacion-card:hover {
@@ -240,16 +253,33 @@ header p {
   margin-bottom: 0.75rem;
 }
 
+.card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.card-avatar {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .card-header h2 {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .temp-badge {
@@ -257,7 +287,7 @@ header p {
   font-weight: 500;
   color: var(--text-secondary);
   padding: 0.2rem 0.55rem;
-  border-radius: 6px;
+  border-radius: 8px;
   background: color-mix(in srgb, var(--text) 6%, var(--bg-card));
   transition: background var(--transition), color var(--transition);
 }
@@ -276,35 +306,42 @@ header p {
 }
 
 .fav:hover {
-  transform: scale(1.25);
+  transform: scale(1.2);
   color: var(--accent-hover);
 }
 
-/* ── AQI Hero ── */
+/* ── AQI Hero con glow neón ── */
 
 .aqi-hero {
   text-align: center;
-  padding: 1rem 0.75rem;
+  padding: 1.25rem 0.75rem;
   margin-bottom: 0.75rem;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--aqi-color, var(--text)) 9%, var(--bg-card));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--aqi-color, var(--text)) 8%, var(--bg-card));
   border-left: 4px solid var(--aqi-color, var(--text));
-  transition: background var(--transition), border-color var(--transition);
+  transition: background var(--transition), border-color var(--transition),
+              box-shadow var(--transition);
 }
 
 .aqi-value {
   display: block;
-  font-size: 3rem;
-  font-weight: 800;
+  font-size: 3.25rem;
+  font-weight: 900;
   line-height: 1;
   letter-spacing: -0.04em;
   color: var(--aqi-color, var(--text));
-  transition: color var(--transition);
+  text-shadow: 0 0 16px color-mix(in srgb, var(--aqi-color, transparent) 60%, transparent),
+               0 0 32px color-mix(in srgb, var(--aqi-color, transparent) 30%, transparent);
+  transition: color var(--transition), text-shadow var(--transition);
+}
+
+[data-tema="claro"] .aqi-value {
+  text-shadow: none;
 }
 
 .aqi-label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   margin-top: 0.35rem;
   color: var(--text-secondary);
@@ -315,9 +352,9 @@ header p {
 
 /* ── AQI levels ── */
 
-.aqi-bueno { --aqi-color: var(--bueno); }
+.aqi-bueno   { --aqi-color: var(--bueno); }
 .aqi-moderado { --aqi-color: var(--moderado); }
-.aqi-danino { --aqi-color: var(--danino); }
+.aqi-danino  { --aqi-color: var(--danino); }
 .aqi-peligroso { --aqi-color: var(--malo); }
 
 /* ── Card metrics ── */
@@ -329,8 +366,8 @@ header p {
 
 .metric {
   flex: 1;
-  padding: 0.65rem 0.5rem;
-  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
   background: color-mix(in srgb, var(--text) 4%, var(--bg-card));
   text-align: center;
   transition: background var(--transition);
@@ -363,6 +400,36 @@ header p {
   transition: color var(--transition);
 }
 
+/* ── Barra de progreso PM2.5 ── */
+
+.pm25-bar-track {
+  height: 5px;
+  background: color-mix(in srgb, var(--text) 8%, var(--bg-card));
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.pm25-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pm25-bueno     { background: var(--bueno); }
+.pm25-moderado  { background: var(--moderado); }
+.pm25-danino    { background: var(--danino); }
+.pm25-peligroso { background: var(--malo); }
+
+.pm25-limit-label {
+  display: block;
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  margin-top: 0.3rem;
+  opacity: 0.7;
+  transition: color var(--transition);
+}
+
 /* ── Sección de ayuda ── */
 
 #ayuda {
@@ -380,12 +447,63 @@ header p {
   font-weight: 700;
 }
 
-#ayuda h3 {
-  margin: 1.25rem 0 0.5rem;
-  font-size: 0.95rem;
+/* ── Acordeón (details/summary) ── */
+
+#ayuda details {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 0.65rem;
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+
+#ayuda details:last-of-type {
+  margin-bottom: 0;
+}
+
+#ayuda details[open] {
+  border-color: color-mix(in srgb, var(--accent) 25%, var(--border));
+}
+
+#ayuda summary {
+  cursor: pointer;
+  padding: 0.85rem 1rem;
   font-weight: 600;
+  font-size: 0.92rem;
   color: var(--accent);
-  transition: color var(--transition);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.15s, color var(--transition);
+  user-select: none;
+}
+
+#ayuda summary::-webkit-details-marker {
+  display: none;
+}
+
+#ayuda summary::after {
+  content: '+';
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: transform var(--transition), color var(--transition);
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+#ayuda details[open] summary::after {
+  content: '−';
+  color: var(--accent);
+}
+
+#ayuda summary:hover {
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg-card));
+}
+
+.accordion-body {
+  padding: 0 1rem 1rem;
 }
 
 #ayuda p {
@@ -427,12 +545,12 @@ header p {
 }
 
 .aqi-escala li {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
+  display: block;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
   transition: background var(--transition);
+  margin-bottom: 0.25rem;
+  line-height: 1.5;
 }
 
 .aqi-escala li:hover {
@@ -440,23 +558,23 @@ header p {
 }
 
 .aqi-escala .dot {
-  flex-shrink: 0;
+  display: inline-block;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  display: inline-block;
+  margin-right: 0.5rem;
 }
 
 .aqi-escala li::before {
   display: none;
 }
 
-.escala-bueno .dot { background: var(--bueno); }
-.escala-moderado .dot { background: var(--moderado); }
-.escala-danino .dot { background: var(--danino); }
-.escala-peligroso .dot { background: var(--malo); }
-.escala-muy-peligroso .dot { background: #9333ea; }
-.escala-extremo .dot { background: #7c0a2e; }
+.escala-bueno .dot        { background: var(--bueno); }
+.escala-moderado .dot     { background: var(--moderado); }
+.escala-danino .dot       { background: var(--danino); }
+.escala-peligroso .dot    { background: var(--malo); }
+.escala-muy-peligroso .dot { background: #a855f7; }
+.escala-extremo .dot      { background: #be123c; }
 
 #ayuda .aqi-escala li strong {
   color: var(--text);

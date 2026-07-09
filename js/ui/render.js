@@ -1,4 +1,4 @@
-import { nivelAQI, aFahrenheit, claseAQI } from '../utils/logic.js';
+import { nivelAQI, aFahrenheit, claseAQI, emojiAQI, clasePM25 } from '../utils/logic.js';
 
 export function renderEstaciones(estaciones, estado, contenedor) {
   contenedor.innerHTML = '';
@@ -14,10 +14,19 @@ export function renderEstaciones(estaciones, estado, contenedor) {
 
     const aqiNum = typeof aqi === 'number' ? aqi : null;
     const aqiCls = aqiNum !== null ? claseAQI(aqiNum) : '';
+    const avatar = aqiNum !== null ? emojiAQI(aqiNum) : '🌤️';
+
+    // PM2.5 bar
+    const pm25Num = typeof pm25 === 'number' ? pm25 : null;
+    const barWidth = pm25Num !== null ? Math.min((pm25Num / 15) * 100, 100) : 0;
+    const barClass = pm25Num !== null ? clasePM25(pm25Num) : 'pm25-bueno';
 
     card.innerHTML = `
       <div class="card-header">
-        <h2>${barrio}</h2>
+        <div class="card-title-group">
+          <span class="card-avatar">${avatar}</span>
+          <h2>${barrio}</h2>
+        </div>
         <div class="card-actions">
           <span class="temp-badge">${temp}</span>
           <button class="fav" aria-label="Favorito">${esFav ? '★' : '☆'}</button>
@@ -32,6 +41,10 @@ export function renderEstaciones(estaciones, estado, contenedor) {
           <span class="metric-label">PM2.5</span>
           <span class="metric-value">${pm25}</span>
           <span class="metric-unit">µg/m³</span>
+          <div class="pm25-bar-track">
+            <div class="pm25-bar-fill ${barClass}" style="width: ${barWidth}%"></div>
+          </div>
+          <span class="pm25-limit-label">Límite OMS: 15 µg/m³</span>
         </div>
       </div>
     `;

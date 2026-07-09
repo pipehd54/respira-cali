@@ -39,6 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
   btnTemp.textContent = estado.unidad === 'C' ? 'Mostrar °F' : 'Mostrar °C';
   btnTemp.setAttribute('aria-pressed', estado.unidad === 'F');
 
+  btnTemp.addEventListener('click', () => {
+    estado.unidad = estado.unidad === 'C' ? 'F' : 'C';
+    btnTemp.textContent = estado.unidad === 'C' ? 'Mostrar °F' : 'Mostrar °C';
+    btnTemp.setAttribute('aria-pressed', estado.unidad === 'F');
+    actualizar();
+  });
+
+  const form = document.querySelector('#filtros');
+  if (form) {
+    form.addEventListener('submit', e => e.preventDefault());
+  }
+
   const onBuscar = debounce(e => {
   estado.busqueda = e.target.value.trim();
   actualizar();

@@ -1,5 +1,4 @@
-const aFahrenheit = c => Math.round(c * 9/5 + 32);
-const nivelAQI = aqi => aqi <= 50 ? 'Bueno' : aqi <= 100 ? 'Moderado' : 'No saludable';
+import { nivelAQI, aFahrenheit } from '../utils/logic.js';
 
 export function renderEstaciones(estaciones, estado, contenedor) {
   contenedor.innerHTML = '';

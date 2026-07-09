@@ -363,6 +363,107 @@ header p {
   transition: color var(--transition);
 }
 
+/* ── Sección de ayuda ── */
+
+#ayuda {
+  margin-top: 2.5rem;
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: background var(--transition), border-color var(--transition);
+}
+
+#ayuda h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+#ayuda h3 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent);
+  transition: color var(--transition);
+}
+
+#ayuda p {
+  margin: 0 0 0.5rem;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+#ayuda ul {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#ayuda ul li {
+  position: relative;
+  padding: 0.35rem 0 0.35rem 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+#ayuda ul li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* ── Escala AQI con dots de color ── */
+
+.aqi-escala {
+  margin: 0.75rem 0 0;
+}
+
+.aqi-escala li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+
+.aqi-escala li:hover {
+  background: color-mix(in srgb, var(--text) 3%, var(--bg-card));
+}
+
+.aqi-escala .dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.aqi-escala li::before {
+  display: none;
+}
+
+.escala-bueno .dot { background: var(--bueno); }
+.escala-moderado .dot { background: var(--moderado); }
+.escala-danino .dot { background: var(--danino); }
+.escala-peligroso .dot { background: var(--malo); }
+.escala-muy-peligroso .dot { background: #9333ea; }
+.escala-extremo .dot { background: #7c0a2e; }
+
+#ayuda .aqi-escala li strong {
+  color: var(--text);
+  white-space: nowrap;
+  transition: color var(--transition);
+}
+
 /* ── Footer ── */
 
 footer {

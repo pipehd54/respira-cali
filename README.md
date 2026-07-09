@@ -1,7 +1,21 @@
 # Respira Cali
-Dashboard en vivo de calidad del aire para Santiago de Cali.
 
-**Stack:** HTML, CSS, JavaScript Vanilla ES2024+  
-**Estado:** Fase 0 – Setup
+Calidad del aire en tiempo real para Santiago de Cali. PWA ligera construida con Vanilla JS.
 
-Proyecto del curso JavaScript de cero a portfolio profesional.
+**Demo:** https://respira-cali.vercel.app/
+
+## Stack
+- Vanilla JS ES2024+ (módulos)
+- Open-Meteo Air Quality + Weather API
+- localStorage, debounce, a11y
+
+## Lighthouse
+- Performance: 98
+- Accessibility: 100
+- Best Practices: 100
+
+## Desarrollo
+```bash
+git clone...
+npm install
+npm test

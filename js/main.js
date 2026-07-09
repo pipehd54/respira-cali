@@ -33,9 +33,23 @@ async function actualizar() {
 document.addEventListener('DOMContentLoaded', () => {
   const input = document.querySelector('#busqueda');
   const btnTemp = document.querySelector('#toggle-temp');
+  const btnTema = document.querySelector('#toggle-tema');
   const contenedor = document.querySelector('#estaciones');
 
-  input.value = estado.busqueda; // restaura búsqueda
+  // Tema
+  document.documentElement.setAttribute('data-tema', estado.tema);
+  btnTema.textContent = estado.tema === 'claro' ? '☀️' : '🌙';
+  btnTema.setAttribute('aria-label', estado.tema === 'claro' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+  btnTema.addEventListener('click', () => {
+    estado.tema = estado.tema === 'claro' ? 'oscuro' : 'claro';
+    document.documentElement.setAttribute('data-tema', estado.tema);
+    btnTema.textContent = estado.tema === 'claro' ? '☀️' : '🌙';
+    btnTema.setAttribute('aria-label', estado.tema === 'claro' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+    guardarEstado(estado);
+  });
+
+  // Busqueda
+  input.value = estado.busqueda;
   btnTemp.textContent = estado.unidad === 'C' ? 'Mostrar °F' : 'Mostrar °C';
   btnTemp.setAttribute('aria-pressed', estado.unidad === 'F');
 

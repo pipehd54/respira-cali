@@ -10,18 +10,19 @@
 </head>
 <body>
   <header>
-    <h1>Respira Cali</h1>
-    <p>Calidad del aire actual de la ciudad de Cali</p>
+    <div class="header-row">
+      <div>
+        <h1>Respira Cali</h1>
+        <p>Calidad del aire actual de la ciudad de Cali</p>
+      </div>
+      <button type="button" id="toggle-tema" class="btn-header" aria-label="Cambiar a modo claro">🌙</button>
+    </div>
 
     <form id="filtros" role="search">
-    <label for="busqueda">Buscar barrio</label>
-    <input id="busqueda" type="search" placeholder="Ej: San Fernando" autocomplete="off">
-    
-    <button type="button" id="toggle-temp" aria-pressed="false">
-      Mostrar °F
-    </button>
-  </form>
-  
+      <label for="busqueda">Buscar barrio</label>
+      <input id="busqueda" type="search" placeholder="Ej: San Fernando" autocomplete="off">
+      <button type="button" id="toggle-temp" class="btn-header" aria-pressed="false">Mostrar °F</button>
+    </form>
   </header>
   
   <main id="app">

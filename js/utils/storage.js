@@ -1,10 +1,20 @@
 const KEY = 'respira-cali-estado';
 
+const PREDETERMINADO = { unidad: 'C', busqueda: '', favoritos: [], tema: 'oscuro' };
+
 export function guardarEstado(estado) {
-  localStorage.setItem(KEY, JSON.stringify(estado));
+  try {
+    localStorage.setItem(KEY, JSON.stringify(estado));
+  } catch {
+    // localStorage lleno o deshabilitado — ignorar silenciosamente
+  }
 }
 
 export function cargarEstado() {
-  const raw = localStorage.getItem(KEY);
-  return raw ? JSON.parse(raw) : { unidad: 'C', busqueda: '', favoritos: [] };
+  try {
+    const raw = localStorage.getItem(KEY);
+    return raw ? { ...PREDETERMINADO, ...JSON.parse(raw) } : { ...PREDETERMINADO };
+  } catch {
+    return { ...PREDETERMINADO };
+  }
 }

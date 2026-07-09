@@ -1,37 +1,216 @@
 :root {
   --bg: #0f172a;
-  --card: #1e293b;
+  --bg-card: #1e293b;
   --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: #334155;
   --bueno: #22c55e;
   --moderado: #eab308;
   --malo: #ef4444;
+  --accent: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --radius: 12px;
+  --transition: 0.3s ease;
+}
+
+[data-tema="claro"] {
+  --bg: #f8fafc;
+  --bg-card: #ffffff;
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
   margin: 0;
-  padding: 1rem;
+  padding: 1.5rem;
+  line-height: 1.6;
+  transition: background var(--transition), color var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+header, main, footer {
+  width: 100%;
+  max-width: 640px;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+header p {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+#filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+#filtros label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+#busqueda {
+  flex: 1 1 180px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.9rem;
+  transition: background var(--transition), color var(--transition),
+              border-color var(--transition), box-shadow var(--transition);
+}
+
+#busqueda:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.btn-header {
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition),
+              border-color var(--transition), transform 0.15s;
+  white-space: nowrap;
+}
+
+.btn-header:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.btn-header:active {
+  transform: translateY(0);
+}
+
+#toggle-tema {
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0.4rem 0.65rem;
 }
 
 .estacion-card {
-  background: var(--card);
-  padding: 1rem;
-  border-radius: 8px;
+  background: var(--bg-card);
+  padding: 1.25rem;
+  border-radius: var(--radius);
   margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: background var(--transition), box-shadow var(--transition),
+              border-color var(--transition), transform 0.2s;
+}
+
+.estacion-card:hover {
+  transform: translateY(-2px);
+}
+
+.estacion-card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.estacion-card p {
+  margin: 0.3rem 0;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+.estacion-card strong {
+  color: var(--text);
+  transition: color var(--transition);
 }
 
 .bueno {
   color: var(--bueno);
+  font-weight: 600;
 }
 
 .moderado {
   color: var(--moderado);
+  font-weight: 600;
 }
 
 .malo {
   color: var(--malo);
+  font-weight: 600;
 }
 
-.fav { background:none; border:none; font-size:1.2rem; cursor:pointer; }
+.fav {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: transform 0.15s, color var(--transition);
+  color: var(--accent);
+}
+
+.fav:hover {
+  transform: scale(1.2);
+}
+
+footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+}
+
+[role="alert"] {
+  color: var(--malo);
+  font-weight: 500;
+  text-align: center;
+  padding: 2rem 0;
+}

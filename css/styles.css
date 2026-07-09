@@ -69,10 +69,12 @@ header h1 {
 }
 
 header p {
-  margin: 0.15rem 0 0;
-  font-size: 0.9rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
   color: var(--text-secondary);
   transition: color var(--transition);
+  max-width: 480px;
 }
 
 /* ── Formulario ── */

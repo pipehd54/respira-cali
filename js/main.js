@@ -89,10 +89,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ── Búsqueda con geocoding ──
+
+  // Envolver input en search-wrapper para posicionar el dropdown
+  const searchWrapper = document.createElement('div');
+  searchWrapper.className = 'search-wrapper';
+  input.parentNode.insertBefore(searchWrapper, input);
+  searchWrapper.appendChild(input);
+
   const resultadosDiv = document.createElement('div');
   resultadosDiv.id = 'resultados-busqueda';
   resultadosDiv.className = 'resultados-busqueda';
-  input.parentNode.appendChild(resultadosDiv);
+  searchWrapper.appendChild(resultadosDiv);
+
+  // Cerrar dropdown al hacer clic fuera
+  document.addEventListener('click', e => {
+    if (!searchWrapper.contains(e.target)) {
+      resultadosDiv.innerHTML = '';
+    }
+  });
 
   const onBuscar = debounce(async (e) => {
     const query = e.target.value.trim();

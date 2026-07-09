@@ -2,6 +2,7 @@ import { getAire } from './api/aire.js';
 import { getClima } from './api/clima.js';
 import { guardarEstado, cargarEstado } from './utils/storage.js';
 import { renderEstaciones } from './ui/render.js';
+import { debounce } from './utils/debounce.js';
 
 const estado = cargarEstado(); // recupera última sesión
 let datosCali = [];
@@ -40,8 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
   btnTemp.textContent = estado.unidad === 'C' ? 'Mostrar °F' : 'Mostrar °C';
   btnTemp.setAttribute('aria-pressed', estado.unidad === 'F');
 
-  input.addEventListener('input', e => { estado.busqueda = e.target.value.trim(); actualizar(); });
-  btnTemp.addEventListener('click', () => { estado.unidad = estado.unidad === 'C' ? 'F' : 'C'; actualizar(); });
+  const onBuscar = debounce(e => {
+  estado.busqueda = e.target.value.trim();
+  actualizar();
+  }, 300);
+
+  input.addEventListener('input', onBuscar);
 
   // Delegación: un solo listener para todos los botones de favorito
   contenedor.addEventListener('click', e => {

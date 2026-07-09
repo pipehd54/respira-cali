@@ -12,8 +12,31 @@ async function obtenerDatos() {
   const contenedor = document.querySelector('#estaciones');
   contenedor.innerHTML = '<p aria-live="polite">Cargando...</p>';
   try {
-    const [aire, clima] = await Promise.all([getAire(), getClima()]);
-    datosCali = [{ id: 'cali', barrio: 'Cali (general)', ...aire, ...clima }];
+    const promesas = [
+      Promise.all([getAire(), getClima()]).then(([aire, clima]) => ({
+        id: 'cali',
+        barrio: 'Cali (general)',
+        lat: 3.4516,
+        lon: -76.532,
+        ...aire,
+        ...clima
+      }))
+    ];
+
+    estado.favoritos.forEach(f => {
+      promesas.push(
+        Promise.all([getAire(f.lat, f.lon), getClima(f.lat, f.lon)]).then(([aire, clima]) => ({
+          id: f.barrio,
+          barrio: f.barrio,
+          lat: f.lat,
+          lon: f.lon,
+          ...aire,
+          ...clima
+        }))
+      );
+    });
+
+    datosCali = await Promise.all(promesas);
   } catch {
     contenedor.innerHTML = '<p role="alert">Error de red</p>';
     datosCali = [];
@@ -77,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (query.length < 3) {
       resultadosDiv.innerHTML = '';
+      datosCali = []; // Forza recarga de la lista general (Cali + favoritos)
       actualizar();
       return;
     }
@@ -113,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resultadosDiv.innerHTML = '';
     input.value = item.textContent.trim();
+    estado.busqueda = item.textContent.trim(); // Ajustar búsqueda al barrio seleccionado
 
     try {
       const [aire, clima] = await Promise.all([
@@ -123,6 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
       datosCali = [{
         id: 'buscado',
         barrio: item.textContent.trim(),
+        lat: lat,
+        lon: lon,
         ...aire,
         ...clima,
       }];
@@ -138,10 +165,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Favoritos (delegación) ──
   contenedor.addEventListener('click', e => {
     if (e.target.classList.contains('fav')) {
-      const barrio = e.target.closest('article').dataset.barrio;
-      estado.favoritos = estado.favoritos.includes(barrio)
-        ? estado.favoritos.filter(b => b !== barrio)
-        : [...estado.favoritos, barrio];
+      const card = e.target.closest('article');
+      const barrio = card.dataset.barrio;
+      const lat = parseFloat(card.dataset.lat);
+      const lon = parseFloat(card.dataset.lon);
+
+      const existe = estado.favoritos.some(f => f.barrio === barrio);
+      if (existe) {
+        estado.favoritos = estado.favoritos.filter(f => f.barrio !== barrio);
+        // Si no estamos buscando, remover de la UI inmediatamente
+        if (estado.busqueda.length < 3) {
+          datosCali = datosCali.filter(d => d.barrio !== barrio);
+        }
+      } else {
+        estado.favoritos = [...estado.favoritos, { barrio, lat, lon }];
+      }
       actualizar();
     }
   });

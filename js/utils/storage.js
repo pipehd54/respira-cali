@@ -13,7 +13,22 @@ export function guardarEstado(estado) {
 export function cargarEstado() {
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? { ...PREDETERMINADO, ...JSON.parse(raw) } : { ...PREDETERMINADO };
+    const estado = raw ? { ...PREDETERMINADO, ...JSON.parse(raw) } : { ...PREDETERMINADO };
+    estado.busqueda = ''; // Nunca persistir la búsqueda entre sesiones
+
+    // Sanitizar favoritos antiguos (compatibilidad hacia atrás)
+    if (Array.isArray(estado.favoritos)) {
+      estado.favoritos = estado.favoritos.map(f => {
+        if (typeof f === 'string') {
+          return { barrio: f, lat: 3.4516, lon: -76.532 };
+        }
+        return f;
+      });
+    } else {
+      estado.favoritos = [];
+    }
+
+    return estado;
   } catch {
     return { ...PREDETERMINADO };
   }

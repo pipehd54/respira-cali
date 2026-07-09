@@ -1,90 +1,58 @@
-// Estado
-const estado = { unidad: 'C', busqueda: '' };
-const API_AIRE = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=3.4516&longitude=-76.532&current=us_aqi_pm2_5,pm2_5,pm10&timezone=America/Bogota';
-const API_CLIMA = 'https://api.open-meteo.com/v1/forecast?latitude=3.4516&longitude=-76.532&current=temperature_2m&timezone=America/Bogota';
+import { getAire } from './api/aire.js';
+import { getClima } from './api/clima.js';
+import { guardarEstado, cargarEstado } from './utils/storage.js';
+import { renderEstaciones } from './ui/render.js';
 
-// Utilidades
-const aFahrenheit = c => Math.round(c * 9/5 + 32);
-const nivelAQI = aqi => aqi <= 50? 'Bueno' : aqi <= 100? 'Moderado' : 'No saludable';
+const estado = cargarEstado(); // recupera última sesión
+let datosCali = [];
 
-// 1. Función async que trae datos reales
-async function obtenerDatosReales() {
+async function obtenerDatos() {
   const contenedor = document.querySelector('#estaciones');
-  contenedor.innerHTML = '<p aria-live="polite">Cargando datos de Cali...</p>';
-
+  contenedor.innerHTML = '<p aria-live="polite">Cargando...</p>';
   try {
-    // Promise.all lanza las dos peticiones en paralelo
-    const [resAire, resClima] = await Promise.all([
-      fetch(API_AIRE),
-      fetch(API_CLIMA)
-    ]);
-
-    if (!resAire.ok ||!resClima.ok) throw new Error('Error en la red');
-
-    const dataAire = await resAire.json();
-    const dataClima = await resClima.json();
-
-    // Mapeamos a nuestra estructura (simulamos 3 barrios con mismos datos)
-    const base = {
-      aqi: dataAire.current.us_aqi_pm2_5,
-      pm25: dataAire.current.pm2_5,
-      tempC: dataClima.current.temperature_2m
-    };
-
-    return [
-      { id:1, barrio:'La Flora',...base, nivel: nivelAQI(base.aqi) },
-      { id:2, barrio:'San Fernando',...base, nivel: nivelAQI(base.aqi) },
-      { id:3, barrio:'Aguablanca',...base, nivel: nivelAQI(base.aqi) }
-    ];
-
-  } catch (error) {
-    console.error(error);
-    contenedor.innerHTML = '<p role="alert">No se pudo cargar el aire de Cali. Intenta recargar.</p>';
-    return []; // devolvemos vacío para no romper render
+    const [aire, clima] = await Promise.all([getAire(), getClima()]);
+    const base = { ...aire, ...clima };
+    datosCali = ['La Flora','San Fernando','Aguablanca'].map(barrio => ({ id: barrio, barrio, ...base }));
+  } catch (e) {
+    contenedor.innerHTML = '<p role="alert">Error de red</p>';
+    datosCali = [];
   }
 }
 
-// 2. Filtros y render (igual que antes, pero con temp real)
-const aplicarFiltros = estaciones => estaciones
- .filter(({ aqi }) => aqi >= 0) // ahora mostramos todo, el filtro AQI lo maneja el usuario
- .filter(({ barrio }) => barrio.toLowerCase().includes(estado.busqueda.toLowerCase()));
-
-const renderEstaciones = estaciones => {
-  const contenedor = document.querySelector('#estaciones');
-  contenedor.innerHTML = '';
-  estaciones.forEach(({ barrio, aqi, nivel, tempC, pm25 }) => {
-    const temp = estado.unidad === 'C'? `${tempC}°C` : `${aFahrenheit(tempC)}°F`;
-    const card = document.createElement('article');
-    card.className = 'estacion-card';
-    card.tabIndex = 0;
-    card.innerHTML = `<h2>${barrio}</h2>
-      <p>AQI: <strong>${aqi}</strong> — ${nivel}</p>
-      <p>PM2.5: ${pm25} µg/m³</p>
-      <p>Temp: ${temp}</p>`;
-    contenedor.append(card);
-  });
-};
-
-// 3. Orquestador async
-let datosCali = [];
-
-async function actualizarVista() {
-  if (datosCali.length === 0) datosCali = await obtenerDatosReales();
-  const filtradas = aplicarFiltros(datosCali);
-  renderEstaciones(filtradas);
+function aplicarFiltros() {
+  return datosCali.filter(({ barrio }) => 
+    barrio.toLowerCase().includes(estado.busqueda.toLowerCase())
+  );
 }
 
-// Eventos (sin cambios)
+async function actualizar() {
+  if (!datosCali.length) await obtenerDatos();
+  renderEstaciones(aplicarFiltros(), estado, document.querySelector('#estaciones'));
+  guardarEstado(estado); // persiste en cada cambio
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('#busqueda').addEventListener('input', e => {
-    estado.busqueda = e.target.value.trim();
-    actualizarVista();
+  const input = document.querySelector('#busqueda');
+  const btnTemp = document.querySelector('#toggle-temp');
+  const contenedor = document.querySelector('#estaciones');
+
+  input.value = estado.busqueda; // restaura búsqueda
+  btnTemp.textContent = estado.unidad === 'C' ? 'Mostrar °F' : 'Mostrar °C';
+  btnTemp.setAttribute('aria-pressed', estado.unidad === 'F');
+
+  input.addEventListener('input', e => { estado.busqueda = e.target.value.trim(); actualizar(); });
+  btnTemp.addEventListener('click', () => { estado.unidad = estado.unidad === 'C' ? 'F' : 'C'; actualizar(); });
+
+  // Delegación: un solo listener para todos los botones de favorito
+  contenedor.addEventListener('click', e => {
+    if (e.target.classList.contains('fav')) {
+      const barrio = e.target.closest('article').dataset.barrio;
+      estado.favoritos = estado.favoritos.includes(barrio)
+        ? estado.favoritos.filter(b => b !== barrio)
+        : [...estado.favoritos, barrio];
+      actualizar();
+    }
   });
-  document.querySelector('#toggle-temp').addEventListener('click', e => {
-    estado.unidad = estado.unidad === 'C'? 'F' : 'C';
-    e.target.textContent = estado.unidad === 'C'? 'Mostrar °F' : 'Mostrar °C';
-    e.target.setAttribute('aria-pressed', estado.unidad === 'F');
-    actualizarVista();
-  });
-  actualizarVista();
+
+  actualizar();
 });

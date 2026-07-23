@@ -3,81 +3,150 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Monitorea el AQI, PM2.5 y temperatura de Cali sin apps pesadas. Datos en vivo de Open-Meteo, búsqueda instantánea con debounce, modo °C/°F y favoritos que recuerdan tu barrio.">
-  <title>Respira Cali</title>
+  <meta name="description" content="Monitorea el AQI, PM2.5 y temperatura de Cali en tiempo real sin apps pesadas. Búsqueda instantánea con debounce, modo °C/°F y favoritos por barrio.">
+  <title>Respira Cali — Calidad del Aire en Vivo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <div class="header-top">
-      <h1>Respira Cali</h1>
-      <button type="button" id="toggle-tema" class="btn-header" aria-label="Cambiar a modo claro">🌙</button>
-    </div>
-    <p>Monitorea el AQI, PM2.5 y temperatura de Cali sin apps pesadas. Datos en vivo de Open-Meteo, búsqueda instantánea con debounce, modo °C/°F y favoritos que recuerdan tu barrio. Construida 100% en JavaScript moderno, sin frameworks, optimizada para móvil y accesible por teclado y lector de pantalla.</p>
-
-    <form id="filtros" role="search">
-      <input id="busqueda" type="search" placeholder="Buscar barrio... (Ej: San Fernando)" autocomplete="off" aria-label="Buscar barrio">
-      <button type="button" id="toggle-temp" class="btn-header" aria-pressed="false">Mostrar °F</button>
-    </form>
-  </header>
-  
-  <main id="app">
-    <section id="estaciones" aria-live="polite">
-      <!-- Aquí renderizamos las tarjetas con JS -->
-    </section>
-
-    <section id="ayuda" aria-labelledby="ayuda-titulo">
-      <h2 id="ayuda-titulo">¿Qué significan estos datos?</h2>
-
-      <details open>
-        <summary>AQI — Índice de Calidad del Aire</summary>
-        <div class="accordion-body">
-          <p>
-            El AQI traduce los niveles de contaminación en un número fácil de entender usando el estándar US AQI (el mismo usado en Colombia).
-          </p>
-          <ul class="aqi-escala">
-            <li class="escala-bueno"><span class="dot"></span> <strong>0-50 Bueno</strong> — Verde. El aire es seguro. Sal a correr sin problema.</li>
-            <li class="escala-moderado"><span class="dot"></span> <strong>51-100 Moderado</strong> — Amarillo. Aceptable, pero personas sensibles podrían sentir molestias.</li>
-            <li class="escala-danino"><span class="dot"></span> <strong>101-150 Dañino para grupos sensibles</strong> — Naranja. Niños, adultos mayores y personas con asma deben limitar el esfuerzo al aire libre.</li>
-            <li class="escala-peligroso"><span class="dot"></span> <strong>151-200 No saludable</strong> — Rojo. Todos pueden empezar a sentir efectos. Reduce actividades intensas afuera.</li>
-            <li class="escala-muy-peligroso"><span class="dot"></span> <strong>201-300 Muy no saludable</strong> — Alerta de salud. Evita salir si puedes.</li>
-            <li class="escala-extremo"><span class="dot"></span> <strong>301+ Peligroso</strong> — Emergencia. Permanece en interiores.</li>
-          </ul>
+  <div class="app-container">
+    <header class="hero-header">
+      <div class="header-top-bar">
+        <div class="live-badge">
+          <span class="live-pulse" aria-hidden="true"></span>
+          <span>DATOS EN VIVO · SANTIAGO DE CALI</span>
         </div>
-      </details>
+        <button type="button" id="toggle-tema" class="btn-theme-toggle" aria-label="Cambiar tema de color">
+          <span class="theme-icon" aria-hidden="true">🌙</span>
+        </button>
+      </div>
 
-      <details>
-        <summary>PM2.5 — Partículas finas</summary>
-        <div class="accordion-body">
-          <p>
-            PM2.5 son partículas de 2.5 micrones o menos (un cabello humano mide ~70 µm). Son tan pequeñas que entran a los pulmones y al torrente sanguíneo.
-          </p>
-          <p>
-            El AQI ya incluye PM2.5 en su cálculo, pero mostramos el valor bruto para que conozcas la concentración real. Según la OMS, el límite diario recomendado es 15 µg/m³.
-          </p>
-        </div>
-      </details>
+      <div class="hero-brand">
+        <h1>Respira Cali</h1>
+        <p class="hero-subtitle">Monitoreo de calidad del aire y clima en tiempo real por barrios. Rápido, liviano y sin instalar aplicaciones.</p>
+      </div>
 
-      <details>
-        <summary>¿Qué hacer si el aire está malo?</summary>
-        <div class="accordion-body">
-          <ul>
-            <li>Cierra ventanas y usa purificador si tienes.</li>
-            <li>Evita ejercicio intenso al aire libre.</li>
-            <li>Usa tapabocas N95 si debes salir y el AQI supera 150.</li>
-            <li>Hidrátate: ayuda a tu cuerpo a eliminar partículas.</li>
-          </ul>
+      <form id="filtros" class="search-toolbar" role="search">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="busqueda" type="search" placeholder="Buscar barrio o zona... (Ej: San Fernando, Granada)" autocomplete="off" aria-label="Buscar barrio">
         </div>
-      </details>
-    </section>
-  </main>
-  
-  <footer>
-    <small>Datos: OpenAQ + Open-Meteo | 2026</small>
-  </footer>
+        <button type="button" id="toggle-temp" class="btn-temp-switch" aria-pressed="false">
+          <span class="temp-unit-active">°C</span>
+          <span class="temp-unit-divider">/</span>
+          <span class="temp-unit-inactive">°F</span>
+        </button>
+      </form>
+    </header>
+    
+    <main id="app">
+      <section id="estaciones" class="estaciones-grid" aria-live="polite">
+        <!-- Renderizado dinámico con JS -->
+      </section>
+
+      <section id="ayuda" class="ayuda-container" aria-labelledby="ayuda-titulo">
+        <div class="ayuda-header">
+          <h2 id="ayuda-titulo"> Guía de Salud y Calidad del Aire</h2>
+          <p>Conoce los estándares oficiales US AQI y recomendaciones para cuidar tu salud.</p>
+        </div>
+
+        <div class="accordion-group">
+          <details open class="accordion-card">
+            <summary>
+              <span>AQI — Índice de Calidad del Aire</span>
+            </summary>
+            <div class="accordion-body">
+              <p>
+                El AQI (Air Quality Index) traduce la concentración de contaminantes en una escala de 0 a 500 fácil de comprender.
+              </p>
+              <ul class="aqi-escala-grid">
+                <li class="escala-item escala-bueno">
+                  <span class="badge-dot"></span>
+                  <div class="escala-info">
+                    <strong>0 - 50 Bueno</strong>
+                    <p>Aire limpio y seguro para cualquier actividad al aire libre.</p>
+                  </div>
+                </li>
+                <li class="escala-item escala-moderado">
+                  <span class="badge-dot"></span>
+                  <div class="escala-info">
+                    <strong>51 - 100 Moderado</strong>
+                    <p>Aceptable. Personas extremadante sensibles pueden presentar molestias.</p>
+                  </div>
+                </li>
+                <li class="escala-item escala-danino">
+                  <span class="badge-dot"></span>
+                  <div class="escala-info">
+                    <strong>101 - 150 Grupos Sensibles</strong>
+                    <p>Niños, adultos mayores y asmáticos deben limitar esfuerzo prolongado afuera.</p>
+                  </div>
+                </li>
+                <li class="escala-item escala-nosaludable">
+                  <span class="badge-dot"></span>
+                  <div class="escala-info">
+                    <strong>151 - 200 No Saludable</strong>
+                    <p>Todos pueden sentir efectos. Reduce actividades intensas en exteriores.</p>
+                  </div>
+                </li>
+                <li class="escala-item escala-muynosaludable">
+                  <span class="badge-dot"></span>
+                  <div class="escala-info">
+                    <strong>201 - 300 Muy No Saludable</strong>
+                    <p>Alerta de salud. Evita salir a hacer ejercicio si es posible.</p>
+                  </div>
+                </li>
+                <li class="escala-item escala-peligroso">
+                  <span class="badge-dot"></span>
+                  <div class="escala-info">
+                    <strong>301+ Peligroso</strong>
+                    <p>Condiciones de emergencia. Permanece dentro de casa con ventanas cerradas.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="accordion-card">
+            <summary>
+              <span>PM2.5 — Partículas Respirables Finas</span>
+            </summary>
+            <div class="accordion-body">
+              <p>
+                Las PM2.5 son micropartículas de polvo, hollín y humo de menos de 2.5 micrones (~30 veces más delgadas que un cabello). Debido a su diminuto tamaño, pueden penetrar profundamente en los pulmones.
+              </p>
+              <p>
+                <strong>Límite recomendado por la OMS:</strong> 15 µg/m³ promedio diario.
+              </p>
+            </div>
+          </details>
+
+          <details class="accordion-card">
+            <summary>
+              <span>Recomendaciones Preventivas</span>
+            </summary>
+            <div class="accordion-body">
+              <ul class="tips-list">
+                <li>Cierra ventanas y enciende purificadores de aire si el AQI supera 100.</li>
+                <li>Evita correr en vías principales con alto tráfico vehicular.</li>
+                <li>Utiliza mascarilla N95 si debes permanecer en exteriores con AQI > 150.</li>
+                <li>La hidratación constante ayuda a limpiar las vías respiratorias.</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
+    
+    <footer class="app-footer">
+      <p>Construido con Vanilla JS ES2024+ (sin frameworks) · Datos de Open-Meteo & OpenStreetMap</p>
+      <small>Respira Cali © 2026</small>
+    </footer>
+  </div>
 </body>
-</html>
+</html>

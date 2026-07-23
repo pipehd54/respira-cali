@@ -91,8 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Temperatura ──
   const aplicarUnidadTemp = () => {
-    btnTemp.textContent = estado.unidad === 'C' ? 'Mostrar °F' : 'Mostrar °C';
     btnTemp.setAttribute('aria-pressed', estado.unidad === 'F');
+    const unitC = btnTemp.querySelector('.temp-unit-active, .temp-unit-inactive');
+    if (unitC) {
+      btnTemp.innerHTML = `<span class="${estado.unidad === 'C' ? 'temp-unit-active' : 'temp-unit-inactive'}">°C</span><span class="temp-unit-divider">/</span><span class="${estado.unidad === 'F' ? 'temp-unit-active' : 'temp-unit-inactive'}">°F</span>`;
+    }
   };
   aplicarUnidadTemp();
 

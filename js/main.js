@@ -7,44 +7,56 @@ import { buscarBarrios } from './api/geocoding.js';
 
 const estado = cargarEstado();
 let datosCali = [];
+let searchAbortController = null;
+
+async function fetchEstacionConFallback(id, barrio, lat, lon) {
+  const [aireRes, climaRes] = await Promise.allSettled([
+    getAire(lat, lon),
+    getClima(lat, lon)
+  ]);
+
+  const aire = aireRes.status === 'fulfilled' ? aireRes.value : { aqi: '—', pm25: '—' };
+  const clima = climaRes.status === 'fulfilled' ? climaRes.value : { tempC: '—' };
+
+  return {
+    id,
+    barrio,
+    lat,
+    lon,
+    ...aire,
+    ...clima
+  };
+}
 
 async function obtenerDatos() {
   const contenedor = document.querySelector('#estaciones');
-  contenedor.innerHTML = '<p aria-live="polite">Cargando...</p>';
+  if (!datosCali.length && contenedor) {
+    contenedor.innerHTML = '<p aria-live="polite">Cargando datos del aire...</p>';
+  }
   try {
     const promesas = [
-      Promise.all([getAire(), getClima()]).then(([aire, clima]) => ({
-        id: 'cali',
-        barrio: 'Cali (general)',
-        lat: 3.4516,
-        lon: -76.532,
-        ...aire,
-        ...clima
-      }))
+      fetchEstacionConFallback('cali', 'Cali (general)', 3.4516, -76.532)
     ];
 
     estado.favoritos.forEach(f => {
       promesas.push(
-        Promise.all([getAire(f.lat, f.lon), getClima(f.lat, f.lon)]).then(([aire, clima]) => ({
-          id: f.barrio,
-          barrio: f.barrio,
-          lat: f.lat,
-          lon: f.lon,
-          ...aire,
-          ...clima
-        }))
+        fetchEstacionConFallback(f.barrio, f.barrio, f.lat, f.lon)
       );
     });
 
     datosCali = await Promise.all(promesas);
-  } catch {
-    contenedor.innerHTML = '<p role="alert">Error de red</p>';
+  } catch (error) {
+    console.error('Error obteniendo datos:', error);
+    if (contenedor) {
+      contenedor.innerHTML = '<p role="alert">No se pudieron cargar los datos del aire. Revisa tu conexión.</p>';
+    }
     datosCali = [];
   }
 }
 
 function aplicarFiltros() {
-  const q = (estado.busqueda || '').toLowerCase();
+  const q = (estado.busqueda || '').toLowerCase().trim();
+  if (!q) return datosCali;
   return datosCali.filter(({ barrio }) => barrio.toLowerCase().includes(q));
 }
 
@@ -61,25 +73,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const contenedor = document.querySelector('#estaciones');
   const form = document.querySelector('#filtros');
 
+  if (!input || !btnTemp || !btnTema || !contenedor) return;
+
   // ── Tema ──
-  document.documentElement.setAttribute('data-tema', estado.tema);
-  btnTema.textContent = estado.tema === 'claro' ? '☀️' : '🌙';
-  btnTema.setAttribute('aria-label', estado.tema === 'claro' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
-  btnTema.addEventListener('click', () => {
-    estado.tema = estado.tema === 'claro' ? 'oscuro' : 'claro';
+  const aplicarTema = () => {
     document.documentElement.setAttribute('data-tema', estado.tema);
     btnTema.textContent = estado.tema === 'claro' ? '☀️' : '🌙';
     btnTema.setAttribute('aria-label', estado.tema === 'claro' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro');
+  };
+  aplicarTema();
+
+  btnTema.addEventListener('click', () => {
+    estado.tema = estado.tema === 'claro' ? 'oscuro' : 'claro';
+    aplicarTema();
     guardarEstado(estado);
   });
 
   // ── Temperatura ──
-  btnTemp.textContent = estado.unidad === 'C' ? 'Mostrar °F' : 'Mostrar °C';
-  btnTemp.setAttribute('aria-pressed', estado.unidad === 'F');
-  btnTemp.addEventListener('click', () => {
-    estado.unidad = estado.unidad === 'C' ? 'F' : 'C';
+  const aplicarUnidadTemp = () => {
     btnTemp.textContent = estado.unidad === 'C' ? 'Mostrar °F' : 'Mostrar °C';
     btnTemp.setAttribute('aria-pressed', estado.unidad === 'F');
+  };
+  aplicarUnidadTemp();
+
+  btnTemp.addEventListener('click', () => {
+    estado.unidad = estado.unidad === 'C' ? 'F' : 'C';
+    aplicarUnidadTemp();
     actualizar();
   });
 
@@ -88,9 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', e => e.preventDefault());
   }
 
-  // ── Búsqueda con geocoding ──
-
-  // Envolver input en search-wrapper para posicionar el dropdown
+  // ── Búsqueda con geocoding y accesibilidad ──
   const searchWrapper = document.createElement('div');
   searchWrapper.className = 'search-wrapper';
   input.parentNode.insertBefore(searchWrapper, input);
@@ -99,87 +116,132 @@ document.addEventListener('DOMContentLoaded', () => {
   const resultadosDiv = document.createElement('div');
   resultadosDiv.id = 'resultados-busqueda';
   resultadosDiv.className = 'resultados-busqueda';
+  resultadosDiv.setAttribute('role', 'listbox');
+  resultadosDiv.setAttribute('aria-label', 'Sugerencias de barrios');
   searchWrapper.appendChild(resultadosDiv);
 
-  // Cerrar dropdown al hacer clic fuera
+  let activeIndex = -1;
+
+  const cerrarResultados = () => {
+    resultadosDiv.innerHTML = '';
+    activeIndex = -1;
+    input.removeAttribute('aria-activedescendant');
+  };
+
   document.addEventListener('click', e => {
     if (!searchWrapper.contains(e.target)) {
-      resultadosDiv.innerHTML = '';
+      cerrarResultados();
     }
   });
+
+  const seleccionarBarrio = async (barrioNombre, lat, lon) => {
+    cerrarResultados();
+    input.value = barrioNombre;
+    estado.busqueda = barrioNombre;
+
+    try {
+      const datosBarrio = await fetchEstacionConFallback('buscado', barrioNombre, lat, lon);
+      const indexExistente = datosCali.findIndex(d => d.barrio.toLowerCase() === barrioNombre.toLowerCase());
+      if (indexExistente >= 0) {
+        datosCali[indexExistente] = datosBarrio;
+      } else {
+        datosCali.push(datosBarrio);
+      }
+      actualizar();
+    } catch (err) {
+      console.error('Error al seleccionar barrio:', err);
+    }
+  };
 
   const onBuscar = debounce(async (e) => {
     const query = e.target.value.trim();
     estado.busqueda = query;
 
+    if (searchAbortController) {
+      searchAbortController.abort();
+    }
+    searchAbortController = new AbortController();
+
     if (query.length < 3) {
-      resultadosDiv.innerHTML = '';
-      datosCali = []; // Forza recarga de la lista general (Cali + favoritos)
+      cerrarResultados();
       actualizar();
       return;
     }
 
-    const barrios = await buscarBarrios(query);
+    const barrios = await buscarBarrios(query, searchAbortController.signal);
 
     resultadosDiv.innerHTML = '';
+    activeIndex = -1;
 
     if (barrios.length === 0) {
       const p = document.createElement('p');
       p.textContent = 'No se encontraron barrios';
+      p.className = 'no-resultados';
       resultadosDiv.appendChild(p);
       return;
     }
 
     const fragment = document.createDocumentFragment();
-    barrios.forEach(b => {
+    barrios.forEach((b, index) => {
       const div = document.createElement('div');
       div.className = 'resultado-item';
+      div.id = `opcion-barrio-${index}`;
+      div.setAttribute('role', 'option');
+      div.setAttribute('tabindex', '-1');
       div.dataset.lat = b.lat;
       div.dataset.lon = b.lon;
       div.textContent = b.barrio;
+
+      div.addEventListener('click', () => {
+        seleccionarBarrio(b.barrio, b.lat, b.lon);
+      });
+
       fragment.appendChild(div);
     });
     resultadosDiv.appendChild(fragment);
   }, 300);
 
-  resultadosDiv.addEventListener('click', async (e) => {
-    const item = e.target.closest('.resultado-item');
-    if (!item) return;
+  input.addEventListener('input', onBuscar);
 
-    const lat = parseFloat(item.dataset.lat);
-    const lon = parseFloat(item.dataset.lon);
+  // Navegación por teclado en el input de búsqueda
+  input.addEventListener('keydown', e => {
+    const items = resultadosDiv.querySelectorAll('.resultado-item');
+    if (!items.length) return;
 
-    resultadosDiv.innerHTML = '';
-    input.value = item.textContent.trim();
-    estado.busqueda = item.textContent.trim(); // Ajustar búsqueda al barrio seleccionado
-
-    try {
-      const [aire, clima] = await Promise.all([
-        getAire(lat, lon),
-        getClima(lat, lon),
-      ]);
-
-      datosCali = [{
-        id: 'buscado',
-        barrio: item.textContent.trim(),
-        lat: lat,
-        lon: lon,
-        ...aire,
-        ...clima,
-      }];
-
-      actualizar();
-    } catch (err) {
-      console.error(err);
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = (activeIndex + 1) % items.length;
+      actualizarFocoItem(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = (activeIndex - 1 + items.length) % items.length;
+      actualizarFocoItem(items);
+    } else if (e.key === 'Enter' && activeIndex >= 0 && items[activeIndex]) {
+      e.preventDefault();
+      const item = items[activeIndex];
+      seleccionarBarrio(item.textContent.trim(), parseFloat(item.dataset.lat), parseFloat(item.dataset.lon));
+    } else if (e.key === 'Escape') {
+      cerrarResultados();
     }
   });
 
-  input.addEventListener('input', onBuscar);
+  function actualizarFocoItem(items) {
+    items.forEach((item, idx) => {
+      if (idx === activeIndex) {
+        item.classList.add('active');
+        item.scrollIntoView({ block: 'nearest' });
+        input.setAttribute('aria-activedescendant', item.id);
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  }
 
-  // ── Favoritos (delegación) ──
+  // ── Favoritos (delegación de eventos) ──
   contenedor.addEventListener('click', e => {
-    if (e.target.classList.contains('fav')) {
-      const card = e.target.closest('article');
+    const btnFav = e.target.closest('.fav');
+    if (btnFav) {
+      const card = btnFav.closest('article');
       const barrio = card.dataset.barrio;
       const lat = parseFloat(card.dataset.lat);
       const lon = parseFloat(card.dataset.lon);
@@ -187,8 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const existe = estado.favoritos.some(f => f.barrio === barrio);
       if (existe) {
         estado.favoritos = estado.favoritos.filter(f => f.barrio !== barrio);
-        // Si no estamos buscando, remover de la UI inmediatamente
-        if (estado.busqueda.length < 3) {
+        if (!estado.busqueda && barrio !== 'Cali (general)') {
           datosCali = datosCali.filter(d => d.barrio !== barrio);
         }
       } else {
@@ -199,4 +260,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   actualizar();
-});
+});

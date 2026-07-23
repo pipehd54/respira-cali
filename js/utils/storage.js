@@ -13,23 +13,52 @@ export function guardarEstado(estado) {
 export function cargarEstado() {
   try {
     const raw = localStorage.getItem(KEY);
-    const estado = raw ? { ...PREDETERMINADO, ...JSON.parse(raw) } : { ...PREDETERMINADO };
-    estado.busqueda = ''; // Nunca persistir la búsqueda entre sesiones
+    if (!raw) return { ...PREDETERMINADO };
 
-    // Sanitizar favoritos antiguos (compatibilidad hacia atrás)
-    if (Array.isArray(estado.favoritos)) {
-      estado.favoritos = estado.favoritos.map(f => {
-        if (typeof f === 'string') {
-          return { barrio: f, lat: 3.4516, lon: -76.532 };
-        }
-        return f;
-      });
-    } else {
-      estado.favoritos = [];
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return { ...PREDETERMINADO };
+
+    const estado = { ...PREDETERMINADO };
+
+    // Validar unidad ('C' o 'F')
+    if (parsed.unidad === 'C' || parsed.unidad === 'F') {
+      estado.unidad = parsed.unidad;
+    }
+
+    // Validar tema ('oscuro' o 'claro')
+    if (parsed.tema === 'oscuro' || parsed.tema === 'claro') {
+      estado.tema = parsed.tema;
+    }
+
+    // Sanitizar favoritos
+    if (Array.isArray(parsed.favoritos)) {
+      estado.favoritos = parsed.favoritos
+        .map(f => {
+          if (typeof f === 'string') {
+            return { barrio: f.trim(), lat: 3.4516, lon: -76.532 };
+          }
+          if (
+            f &&
+            typeof f === 'object' &&
+            typeof f.barrio === 'string' &&
+            typeof f.lat === 'number' &&
+            !Number.isNaN(f.lat) &&
+            typeof f.lon === 'number' &&
+            !Number.isNaN(f.lon)
+          ) {
+            return {
+              barrio: f.barrio.trim(),
+              lat: f.lat,
+              lon: f.lon
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
     }
 
     return estado;
   } catch {
     return { ...PREDETERMINADO };
   }
-}
+}

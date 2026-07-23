@@ -173,8 +173,10 @@ header p {
   transition: background 0.15s;
 }
 
-.resultado-item:hover {
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+.resultado-item:hover,
+.resultado-item.active {
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg-card));
+  outline: none;
 }
 
 .resultado-item:active {
